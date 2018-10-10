@@ -1,0 +1,216 @@
+# Modules
+import pygame
+import random
+
+# Specifications
+game_name = 'Blocky!'
+game_font = 'bahnschrift'
+
+width = 650
+height = 650
+fps = 60
+
+score = 0
+lvl_num = 0
+
+size_player = (30,30)
+size_enemy = (20,20)
+size_prize = (20,20)
+
+color_screen = (255,228,181)
+color_text = (0,0,0)
+color_player = (200,8,180)
+color_prize = (0,180,255)
+color_enemy = (255,0,0)
+
+move_enemy = (-3,3)
+
+# Initializing
+pygame.init()
+screen = pygame.display.set_mode((width,height))
+pygame.display.set_caption(game_name)
+clock = pygame.time.Clock()
+
+# Font
+font_name = pygame.font.match_font(game_font)
+def draw_text(surface,text,size,x,y):
+    font = pygame.font.Font(font_name,size)
+    text_surface = font.render(text,True,color_text) 
+    text_rect = text_surface.get_rect()
+    text_rect.midtop = (x,y)
+    surface.blit(text_surface,text_rect)
+
+# Elements
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface(size_player)
+        self.image.fill(color_player)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = width/2
+        self.rect.centery = height/2
+        self.speedx = 0
+        self.speedy = 0
+    def update(self):
+        self.speedx = 0
+        self.speedy = 0
+        keystate = pygame.key.get_pressed()
+        if keystate[pygame.K_LEFT]:
+            self.speedx = -5
+        if keystate[pygame.K_RIGHT]:
+            self.speedx = 5
+        if keystate[pygame.K_UP]:
+            self.speedy = -5
+        if keystate[pygame.K_DOWN]:
+            self.speedy = 5
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+        if self.rect.right > width:
+            self.rect.right = width
+        if self.rect.left < 0:
+            self.rect.left = 0
+        if self.rect.bottom > height:
+            self.rect.bottom = height
+        if self.rect.top < 0:
+            self.rect.top = 0
+
+class Mob1(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface(size_enemy)
+        self.image.fill(color_enemy)
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randrange(width - self.rect.width)
+        self.rect.y = random.randrange(-100,-40)
+        self.speedy = random.randrange(1,6)
+        self.speedx = random.randrange(-4, 4)
+    def update(self):
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+        if self.rect.top > height + 10 or self.rect.left < -25 or self.rect.right > width + 25:
+            self.rect.x = random.randrange(width - self.rect.width)
+            self.rect.y = random.randrange(-100, -40)
+            self.speedy = random.randrange(1, 6)
+            self.speedx = random.randrange(-3,3)
+
+class Mob2(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface(size_enemy)
+        self.image.fill(color_enemy)
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randrange(width+40,width+100)
+        self.rect.y = random.randrange(height - self.rect.height)
+        self.speedy = random.randrange(-3,3)
+        self.speedx = random.randrange(-6, -1)
+    def update(self):
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+        if self.rect.right < 0 or self.rect.bottom < -25 or self.rect.top > height + 25:
+            self.rect.x = random.randrange(width+40,width+100)
+            self.rect.y = random.randrange(height - self.rect.height)
+            self.speedy = random.randrange(-3,3)
+            self.speedx = random.randrange(-6, -1)
+
+class Mob3(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface(size_enemy)
+        self.image.fill(color_enemy)
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randrange(width - self.rect.width)
+        self.rect.y = random.randrange(height+40, height+100)
+        self.speedy = random.randrange(-6,-1)
+        self.speedx = random.randrange(-3,3)
+    def update(self):
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+        if self.rect.bottom < 0 or self.rect.left < -25 or self.rect.right > width + 25:
+            self.rect.x = random.randrange(width - self.rect.width)
+            self.rect.y = random.randrange(height+40, height+100)
+            self.speedy = random.randrange(-6, -1)
+            self.speedx = random.randrange(-3,3)
+
+class Mob4(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface(size_enemy)
+        self.image.fill(color_enemy)
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randrange(-100,-40)
+        self.rect.y = random.randrange(height - self.rect.height)
+        self.speedy = random.randrange(-3,3)
+        self.speedx = random.randrange(1, 6)
+    def update(self):
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+        if self.rect.left > width or self.rect.bottom < -25 or self.rect.top > height + 25:
+            self.rect.x = random.randrange(-100,-40)
+            self.rect.y = random.randrange(height - self.rect.height)
+            self.speedy = random.randrange(-3,3)
+            self.speedx = random.randrange(1, 6)
+
+class Prize(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface(size_prize)
+        self.image.fill(color_prize)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = random.randrange (50,550)
+        self.rect.centery = random.randrange (50,550)
+
+all_sprites = pygame.sprite.Group()
+mobs = pygame.sprite.Group()
+prizes = pygame.sprite.Group()
+player = Player()
+p = Prize()
+all_sprites.add(player)
+all_sprites.add(p)
+prizes.add(p)
+
+# Game Loop
+running = True
+while running:
+    clock.tick(fps)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+    all_sprites.update()
+    hits = pygame.sprite.spritecollide(player,mobs,False)
+    if hits:
+        for i in all_sprites:
+            i.kill()
+        color_screen = (0,0,0)
+        color_text = (255,255,255)
+    prize_collect = pygame.sprite.spritecollide(player, prizes, True)
+    if prize_collect:
+        score += 1
+        lvl_num += 1
+        p = Prize()  # creates a new mob
+        all_sprites.add(p)
+        prizes.add(p)
+        for i in range(1,2):
+            spawn = random.randrange(1, 4)
+            if spawn == 1:
+                m = Mob1()
+                all_sprites.add(m)
+                mobs.add(m)
+            if spawn == 2:
+                m = Mob2()
+                all_sprites.add(m)
+                mobs.add(m)
+            if spawn == 3:
+                m = Mob3()
+                all_sprites.add(m)
+                mobs.add(m)
+            if spawn == 4:
+                m = Mob4()
+                all_sprites.add(m)
+                mobs.add(m)
+
+# Render
+    screen.fill(color_screen)
+    all_sprites.draw(screen)
+    draw_text(screen, str(score), 20, width / 2, 10)
+    pygame.display.flip()
+pygame.quit()
