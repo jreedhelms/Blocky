@@ -159,6 +159,22 @@ class Prize(pygame.sprite.Sprite):
         self.rect.centerx = random.randrange (50,550)
         self.rect.centery = random.randrange (50,550)
 
+def over_display():
+    draw_text(screen, 'Blocky!', 100, width/2,height/4)
+    draw_text(screen, '• Collect the blue blocks', 20, width / 2, height * .55)
+    draw_text(screen, '• Avoid the red blocks', 20, width / 2, height * .60)
+    draw_text(screen, '* Press "Enter" to play! *', 20, width / 2, height*.75)
+    pygame.display.flip()
+    waiting = True
+    while waiting:
+        clock.tick(fps)
+        for i in pygame.event.get():
+            if i.type == pygame.QUIT:
+                pygame.quit()
+            keystate = pygame.key.get_pressed()
+            if keystate[pygame.K_RETURN]:
+                waiting = False
+
 all_sprites = pygame.sprite.Group()
 mobs = pygame.sprite.Group()
 prizes = pygame.sprite.Group()
@@ -168,20 +184,34 @@ all_sprites.add(player)
 all_sprites.add(p)
 prizes.add(p)
 
+
 # Game Loop
 running = True
+game_over = True
 while running:
+    if game_over:
+        color_text = (255, 255, 255)
+        over_display()
+        game_over = False
+        score = 0
+        color_screen = (255, 228, 181)
+        color_text = (0, 0, 0)
+        all_sprites.add(p)
+        all_sprites.add(player)
+        prizes.add(p)
+
     clock.tick(fps)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+    for i in pygame.event.get():
+        if i.type == pygame.QUIT:
             running = False
     all_sprites.update()
     hits = pygame.sprite.spritecollide(player,mobs,False)
     if hits:
         for i in all_sprites:
             i.kill()
-        color_screen = (0,0,0)
-        color_text = (255,255,255)
+        color_screen = (0, 0, 0)
+        color_text = (255, 255, 255)
+        game_over = True
     prize_collect = pygame.sprite.spritecollide(player, prizes, True)
     if prize_collect:
         score += 1
